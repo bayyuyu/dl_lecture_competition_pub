@@ -58,6 +58,18 @@ def process_text(text):
     # 連続するスペースを1つに変換
     text = re.sub(r'\s+', ' ', text).strip()
 
+    # ストップワードの除去
+    stop_words = set(stopwords.words('english'))
+    text = ' '.join([word for word in text.split() if word not in stop_words])
+
+    # ステミング
+    ps = PorterStemmer()
+    text = ' '.join([ps.stem(word) for word in text.split()])
+
+    # レンマタイゼーション
+    lemmatizer = WordNetLemmatizer()
+    text = ' '.join([lemmatizer.lemmatize(word) for word in text.split()])
+
     return text
 
 
