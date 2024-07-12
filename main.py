@@ -79,7 +79,14 @@ def process_text(text):
 
 # 1. データローダーの作成
 class VQADataset(torch.utils.data.Dataset):
-    def __init__(self, df_path, image_dir, transform=None, answer=True, tokenizer=None, max_length=128):
+    transform = transforms.Compose([transforms.RandomHorizontalFlip(p=1.0),  # horizontally flipping
+                                    transforms.RandomRotation(degrees=(-180, 180)),  # random rotation
+                                    transforms.RandomCrop(32, padding=(4, 4, 4, 4), padding_mode='constant'),  # random cropping
+                                    transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5),
+                                    transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 2.0)),
+                                    transforms.RandomErasing(p=0.8, scale=(0.02, 0.33), ratio=(0.3, 3.3)), # random erasing
+                                    transforms.ToTensor()])
+    def __init__(self, df_path, image_dir, transform, answer=True, tokenizer=None, max_length=128):
         self.transform = transform
         self.image_dir = image_dir
         self.df = pandas.read_json(df_path)
