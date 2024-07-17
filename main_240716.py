@@ -163,7 +163,7 @@ class VQADataset(torch.utils.data.Dataset):
         image = Image.open(f"{self.image_dir}/{self.df['image'][idx]}")
         image = self.transform(image)
         # Tokenize the question
-        question_words = self.df["question"][idx].split(" ")
+        question_words = self.df["question"][idx]
         input_ids, attention_mask = self.tokenize_question(question_words)
         
         if self.answer:
