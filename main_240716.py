@@ -163,18 +163,18 @@ class VQADataset(torch.utils.data.Dataset):
         image = Image.open(f"{self.image_dir}/{self.df['image'][idx]}")
         image = self.transform(image)
         # Tokenize the question
-        question = self.questions[idx]
-        input_ids, attention_mask = self.tokenize_question(question)
+        questions = [self.question2idx[process_text(question["question"])] for question in self.df["questions"][idx]]
+        input_ids, attention_mask = self.tokenize_question(questions)
         
         if self.answer:
-            answers = self.answers[idx]
+            answers = [self.answer2idx[process_text(answer["answer"])] for answer in self.df["answers"][idx]]
             mode_answer = self.mode_answers[idx]
             return image, input_ids, attention_mask, answers, mode_answer
         else:
             return image, input_ids, attention_mask
     
     def __len__(self):
-        return len(self.question2idx)
+        return len(self.questions)
     
     def load_image(self, idx):
         # Load the image using PIL (same as before)
@@ -182,8 +182,8 @@ class VQADataset(torch.utils.data.Dataset):
         image = Image.open(image_path).convert("RGB")
         return image
     
-    def tokenize_question(self, question):
-        inputs = tokenizer(question, return_tensors="pt", padding="max_length", truncation=True, max_length=30)
+    def tokenize_question(self, questions):
+        inputs = tokenizer(questions, return_tensors="pt", padding="max_length", truncation=True, max_length=30)
         return inputs['input_ids'].squeeze(), inputs['attention_mask'].squeeze()
 
 
@@ -355,11 +355,11 @@ def train(model, dataloader, optimizer, criterion, device):
     simple_acc = 0
 
     start = time.time()
-    for image, question, answers, mode_answer in dataloader:
-        image, question, answer, mode_answer = \
-            image.to(device), question.to(device), answers.to(device), mode_answer.to(device)
+    for image, questions, answers, mode_answer in dataloader:
+        image, questions, answer, mode_answer = \
+            image.to(device), questions.to(device), answers.to(device), mode_answer.to(device)
 
-        pred = model(image, question)
+        pred = model(image, questions)
         loss = criterion(pred, mode_answer.squeeze())
 
         optimizer.zero_grad()
@@ -381,11 +381,11 @@ def eval(model, dataloader, optimizer, criterion, device):
     simple_acc = 0
 
     start = time.time()
-    for image, question, answers, mode_answer in dataloader:
-        image, question, answer, mode_answer = \
-            image.to(device), question.to(device), answers.to(device), mode_answer.to(device)
+    for image, questions, answers, mode_answer in dataloader:
+        image, questions, answer, mode_answer = \
+            image.to(device), questions.to(device), answers.to(device), mode_answer.to(device)
 
-        pred = model(image, question)
+        pred = model(image, questions)
         loss = criterion(pred, mode_answer.squeeze())
 
         total_loss += loss.item()
