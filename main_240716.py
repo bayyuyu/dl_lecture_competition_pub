@@ -168,7 +168,7 @@ class VQADataset(torch.utils.data.Dataset):
         
         if self.answer:
             answers = [self.answer2idx[process_text(answer["answer"])] for answer in self.df["answers"][idx]]
-            mode_answer = self.mode_answers[idx]
+            mode_answer = mode(answers)
             return image, input_ids, attention_mask, answers, mode_answer
         else:
             return image, input_ids, attention_mask
