@@ -356,8 +356,10 @@ def train(model, dataloader, optimizer, criterion, device):
 
     start = time.time()
     for image, input_ids, attention_mask, answers, mode_answer in dataloader:
-        input_ids = torch.from_numpy(np.asarray(input_ids))
-        attention_mask = torch.from_numpy(np.asarray(attention_mask))
+        input_ids = np.asarray(input_ids)
+        attention_mask = np.asarray(attention_mask)
+        input_ids = torch.from_numpy(input_ids.astype('long'))
+        attention_mask = torch.from_numpy(attention_mask.astype('long'))
         image, input_ids, attention_mask, answer, mode_answer = \
             image.to(device), input_ids.to(device),attention_mask.to(device), answers.to(device), mode_answer.to(device)
 
@@ -384,8 +386,10 @@ def eval(model, dataloader, optimizer, criterion, device):
 
     start = time.time()
     for image, input_ids, attention_mask, answers, mode_answer in dataloader:
-        input_ids = torch.from_numpy(np.asarray(input_ids))
-        attention_mask = torch.from_numpy(np.asarray(attention_mask))
+        input_ids = np.asarray(input_ids)
+        attention_mask = np.asarray(attention_mask)
+        input_ids = torch.from_numpy(input_ids.astype('long'))
+        attention_mask = torch.from_numpy(attention_mask.astype('long'))
         image, input_ids, attention_mask, answer, mode_answer = \
             image.to(device), input_ids.to(device),attention_mask.to(device), answers.to(device), mode_answer.to(device)
 
