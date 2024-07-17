@@ -88,10 +88,15 @@ def process_text(text):
 
 # 1. データローダーの作成
 class VQADataset(torch.utils.data.Dataset):
-    def __init__(self, df_path, image_dir, transform=None, answer=True, tokenizer=None, max_length=128):
+    def __init__(self, df_path, image_dir, transform=None, answer=True, tokenizer=None, max_length=128,include_vizwiz=False):
         self.transform = transform  # 画像の前処理
         self.image_dir = image_dir  # 画像ファイルのディレクトリ
         self.df = pandas.read_json(df_path)  # 画像ファイルのパス，question, answerを持つDataFrame
+        # VizWizデータセットの追加
+        if include_vizwiz:
+            vizwiz_dataset = load_dataset('vizwiz', 'qa')
+            vizwiz_train_df = pandas.DataFrame(vizwiz_dataset['train'])
+            self.df = pandas.concat([self.df, vizwiz_train_df], ignore_index=True)
         self.answer = answer
         self.tokenizer = tokenizer
         self.max_length = max_length
