@@ -163,14 +163,8 @@ class VQADataset(torch.utils.data.Dataset):
         image = Image.open(f"{self.image_dir}/{self.df['image'][idx]}")
         image = self.transform(image)
         # Tokenize the question
-        question = np.zeros(len(self.idx2question) + 1)  # 未知語用の要素を追加
         question_words = self.df["question"][idx].split(" ")
-        for word in question_words:
-            try:
-                question[self.question2idx[word]] = 1  # one-hot表現に変換
-            except KeyError:
-                question[-1] = 1  # 未知語
-        input_ids, attention_mask = self.tokenize_question(question)
+        input_ids, attention_mask = self.tokenize_question(question_words)
         
         if self.answer:
             answers = [self.answer2idx[process_text(answer["answer"])] for answer in self.df["answers"][idx]]
@@ -189,7 +183,7 @@ class VQADataset(torch.utils.data.Dataset):
         return image
     
     def tokenize_question(self, question):
-        inputs = tokenizer(question, return_tensors="pt", padding="max_length", truncation=True, max_length=30)
+        inputs = tokenizer(question, return_tensors="pt", padding="max_length", truncation=True, max_length=128)
         return inputs['input_ids'].squeeze(), inputs['attention_mask'].squeeze()
 
 
