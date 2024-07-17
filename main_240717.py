@@ -342,6 +342,8 @@ def train(model, dataloader, optimizer, criterion, device):
     total_loss = 0
     total_acc = 0
     simple_acc = 0
+    #L2正則化
+    l2_lambda = 0.001
 
     start = time.time()
     for image, question, answers, mode_answer in dataloader:
@@ -349,7 +351,9 @@ def train(model, dataloader, optimizer, criterion, device):
             image.to(device), question.to(device), answers.to(device), mode_answer.to(device)
 
         pred = model(image, question)
-        loss = criterion(pred, mode_answer.squeeze())
+        # L2正則化項を計算
+        l2_norm = sum(p.pow(2.0).sum() for p in model.parameters())
+        loss = criterion(pred, mode_answer.squeeze()) + l2_lambda * l2_norm
 
         optimizer.zero_grad()
         loss.backward()
@@ -420,6 +424,8 @@ def main():
     
     # 追加
     torch.backends.cudnn.benchmark = True
+    
+    
 
     # train model
     for epoch in range(num_epoch):
