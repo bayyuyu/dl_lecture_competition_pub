@@ -173,7 +173,7 @@ class VQADataset(torch.utils.data.Dataset):
             return image, input_ids, attention_mask
     
     def __len__(self):
-        return len(self.questions)
+        return len(self.df)
     
     def load_image(self, idx):
         # Load the image using PIL (same as before)
