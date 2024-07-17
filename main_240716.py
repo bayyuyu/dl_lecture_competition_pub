@@ -87,13 +87,14 @@ def process_text(text):
 
 # 1. データローダーの作成
 class VQADataset(torch.utils.data.Dataset):
-    def __init__(self, df_path, image_dir, transform=None, answer=True, tokenizer=None, max_length=128):
+    def __init__(self, df_path, image_dir, transform=None, answer=True, question=True, tokenizer=None, max_length=128):
         self.transform = transform  # 画像の前処理
         self.image_dir = image_dir  # 画像ファイルのディレクトリ
         self.df = pandas.read_json(df_path)  # 画像ファイルのパス，question, answerを持つDataFrame
         self.answer = answer
         self.tokenizer = tokenizer
         self.max_length = max_length
+        self.question = question
 
         # question / answerの辞書を作成
         self.question2idx = {}
