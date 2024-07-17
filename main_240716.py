@@ -356,6 +356,8 @@ def train(model, dataloader, optimizer, criterion, device):
 
     start = time.time()
     for image, input_ids, attention_mask, answers, mode_answer in dataloader:
+        input_ids = torch.from_numpy(np.asarray(input_ids))
+        attention_mask = torch.from_numpy(np.asarray(attention_mask))
         image, input_ids, attention_mask, answer, mode_answer = \
             image.to(device), input_ids.to(device),attention_mask.to(device), answers.to(device), mode_answer.to(device)
 
@@ -381,11 +383,13 @@ def eval(model, dataloader, optimizer, criterion, device):
     simple_acc = 0
 
     start = time.time()
-    for image, question, answers, mode_answer in dataloader:
-        image, question, answer, mode_answer = \
-            image.to(device), question.to(device), answers.to(device), mode_answer.to(device)
+    for image, input_ids, attention_mask, answers, mode_answer in dataloader:
+        input_ids = torch.from_numpy(np.asarray(input_ids))
+        attention_mask = torch.from_numpy(np.asarray(attention_mask))
+        image, input_ids, attention_mask, answer, mode_answer = \
+            image.to(device), input_ids.to(device),attention_mask.to(device), answers.to(device), mode_answer.to(device)
 
-        pred = model(image, question)
+        pred = model(image, input_ids, attention_mask)
         loss = criterion(pred, mode_answer.squeeze())
 
         total_loss += loss.item()
